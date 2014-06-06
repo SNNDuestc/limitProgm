@@ -69,6 +69,57 @@ public class ScrollLayout extends ViewGroup {
 	}
 	
 	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		// TODO Auto-generated method stub
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+			
+		final int width = MeasureSpec.getSize(widthMeasureSpec);
+		final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+		
+		final int count = getChildCount();
+		
+		for(int i = 0; i < count; i++) {
+			getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
+		}
+		
+		scrollTo(mCurScreen * width, 0);
+	}
+	
+	public void snapToDestination() {
+		final int screenWidth = getWidth();
+		final int destScreen = (getScrollX() + screenWidth/2)/screenWidth;
+		
+		snapToScreen(destScreen);
+	}
+	
+	public void snapToScreen(int whichScreen) {
+		//get the valid layout page
+		whichScreen = Math.max(0, Math.min(whichScreen, getChildCount() - 1));
+		if(getScrollX() != (whichScreen*getWidth())) {
+			final int delta = whichScreen*getWidth() - getScrollX();
+			
+			mScroller.startScroll(getScrollX(), 0, delta, 0, Math.abs(delta)*2);
+			
+			mCurScreen = whichScreen;
+			invalidate();//Redraw the layout
+			
+			if(mOnViewChangeListener != null) {
+				mOnViewChangeListener.OnViewChange(mCurScreen);
+			}
+		}
+	}
+	
+	@Override
+	public void computeScroll() {
+		// TODO Auto-generated method stub
+		super.computeScroll();
+		if(mScroller.computeScrollOffset()) {
+			scrollTo(mScroller.getCurrX(),mScroller.getCurrY());
+			postInvalidate();
+		}
+	}
+	
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
 		final int action = event.getAction();
@@ -120,8 +171,24 @@ public class ScrollLayout extends ViewGroup {
 			}
 			
 			if(velocityX > SNAP_VELOCITY && mCurScreen > 0) {
-				
+				//Fling enough to move left
+				Log.e(TAG, "snap left");
+				snapToScreen(mCurScreen + 1);				
+			} else if (velocityX < -SNAP_VELOCITY 
+					   && mCurScreen < getChildCount() - 1) {
+				Log.e(TAG, "snap right");
+				snapToScreen(mCurScreen + 1);
+			} else {
+				snapToDestination();
 			}
+		
+			
+			if(mVelocityTracker != null) {
+				mVelocityTracker.recycle();       
+                mVelocityTracker = null; 
+			}
+			
+			break;
 		}
 				
 		return super.onTouchEvent(event);
