@@ -1,10 +1,10 @@
 package com.uestc.snnd.login;
 
 
+import com.uestc.snnd.R;
 import com.uestc.snnd.main.MainActivity;
 import com.uestc.snnd.start.StartActivity;
 
-import android.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

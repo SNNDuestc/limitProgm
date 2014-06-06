@@ -4,6 +4,8 @@ package com.uestc.snnd.setting;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.uestc.snnd.R;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;

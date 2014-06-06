@@ -2,7 +2,6 @@ package com.uestc.snnd.main;
 
 //import com.neurosky.thinkgear.TGDevice;
 
-import android.R;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neurosky.thinkgear.*;
+import com.uestc.snnd.R;
 
 public class MainActivity extends Activity {
 	
