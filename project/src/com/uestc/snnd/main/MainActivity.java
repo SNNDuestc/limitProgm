@@ -5,6 +5,7 @@ package com.uestc.snnd.main;
 import android.R;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,12 +29,12 @@ public class MainActivity extends Activity {
 	
 	TGDevice tgDevice;
 	final boolean rawEnabled = false;
+	private static final int REQUEST_ENABLE_BT = 1;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
         setContentView(R.layout.main_activity);
         
         user_id = (TextView)findViewById(R.id.main_tv_userId);
@@ -47,24 +48,23 @@ public class MainActivity extends Activity {
         raw_data.setMovementMethod(ScrollingMovementMethod.getInstance());
         
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        
         if(bluetoothAdapter == null) {
         	// Alert user that Bluetooth is not available
         	Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-        	//finish();
-        	//return;
         }else {
         	/* create the TGDevice */
         	tgDevice = new TGDevice(bluetoothAdapter, handler);
-        	tgDevice.connect(true);
-            
+        	tgDevice.connect(true);   
         }  
-        
+        if(!bluetoothAdapter.isEnabled()) {
+    		Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+    		startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+    	}        
     }
     
     @Override
     public void onDestroy() {
-    	//tgDevice.close();
+    	tgDevice.close();
         super.onDestroy();
     }
     /**
