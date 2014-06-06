@@ -1,6 +1,4 @@
-package com.uestc.snnd.scroll;
-
-import com.uestc.snnd.listenner.OnViewChangeListener;
+package com.uestc.snnd.introduction;
 
 import android.content.Context;
 import android.util.AttributeSet;

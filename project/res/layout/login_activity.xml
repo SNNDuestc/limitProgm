@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/login_et_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="118dp"
+        android:ems="10"
+        android:inputType="textPassword" 
+        android:hint="@+string/login_et_password">
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/login_et_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/login_et_password"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/login_et_password"
+        android:layout_marginTop="57dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="@+string/login_et_account" />
+
+    <Button
+        android:id="@+id/login_but_confirm"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/login_et_password"
+        android:layout_centerVertical="true"
+        android:text="@+string/but_confirm" />
+
+    <Button
+        android:id="@+id/login_but_cancel"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/login_but_confirm"
+        android:layout_alignRight="@+id/login_et_password"
+        android:text="@+string/but_cancel" />
+
+</RelativeLayout>
