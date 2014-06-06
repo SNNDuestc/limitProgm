@@ -56,14 +56,13 @@
     <TextView
         android:id="@+id/main_tv_data"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_above="@+id/main_but_exit"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/main_tv_userId"
-        android:scrollbars="vertical" 
-    	android:singleLine="false"      
-        android:hint="Raw EEG Data" 
+        android:hint="Raw EEG Data"
+        android:scrollbars="vertical"
+        android:singleLine="false" 
         />
 
 </RelativeLayout>

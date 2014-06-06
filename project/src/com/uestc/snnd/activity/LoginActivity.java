@@ -1,9 +1,5 @@
-package com.uestc.snnd.login;
+package com.uestc.snnd.activity;
 
-
-import com.uestc.snnd.R;
-import com.uestc.snnd.main.MainActivity;
-import com.uestc.snnd.start.StartActivity;
 
 import android.app.Activity;
 import android.content.Intent;

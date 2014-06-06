@@ -1,4 +1,4 @@
-package com.uestc.snnd.main;
+package com.uestc.snnd.activity;
 
 //import com.neurosky.thinkgear.TGDevice;
 
@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neurosky.thinkgear.*;
-import com.uestc.snnd.R;
 
 public class MainActivity extends Activity {
 	
@@ -35,31 +34,43 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
         setContentView(R.layout.main_activity);
         
         user_id = (TextView)findViewById(R.id.main_tv_userId);
         state = (TextView)findViewById(R.id.main_tv_state);
-        state.setMovementMethod(ScrollingMovementMethod.getInstance());
+        raw_data = (TextView)findViewById(R.id.main_tv_data);
         
+        //初始化state文本框
+        state.setMovementMethod(ScrollingMovementMethod.getInstance());
         state.setText("");
         state.append("Android version: " + Integer.valueOf(android.os.Build.VERSION.SDK) + "\n" );
         
-        raw_data = (TextView)findViewById(R.id.main_tv_data);
+        //初始化raw_data文本框
         raw_data.setMovementMethod(ScrollingMovementMethod.getInstance());
         
+        //验证蓝牙设备的状态，并与设备建立连接
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter == null) {
-        	// Alert user that Bluetooth is not available
+        if(bluetoothAdapter == null) 
+        {
+        	// 提示用户设备不支持蓝牙模块
         	Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-        }else {
-        	/* create the TGDevice */
-        	tgDevice = new TGDevice(bluetoothAdapter, handler);
-        	tgDevice.connect(true);   
-        }  
-        if(!bluetoothAdapter.isEnabled()) {
-    		Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-    		startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-    	}        
+        }
+        else
+        {
+        	
+        	 if(!bluetoothAdapter.isEnabled())
+        	 {
+         		Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+         		startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        	 }
+        	 else
+        	 {    
+        		 // 创建脑电设备类TGDevice，并建立连接
+        		 tgDevice = new TGDevice(bluetoothAdapter, handler);
+        		 tgDevice.connect(true); 
+         	 }
+        }      
     }
     
     @Override
