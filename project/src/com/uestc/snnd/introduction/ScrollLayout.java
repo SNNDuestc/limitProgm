@@ -11,14 +11,18 @@ import android.widget.Scroller;
 
 public class ScrollLayout extends ViewGroup {
 
-	private int mCurScreen;    						
+	//当前屏幕索引
+	private int mCurScreen;    	
+	//默认屏幕索引
 	private int mDefaultScreen = 0; 
 	
 	private float mLastMotionX;
 	
-	private Scroller  mScroller;						// sliding controller
+	// 滑动控制器
+	private Scroller  mScroller;						
+	// 手势控制器
+	private VelocityTracker mVelocityTracker;  			
 	
-	private VelocityTracker mVelocityTracker;  			// judging gesture
     private static final int SNAP_VELOCITY = 600; 
     
 	private static final String TAG = "ScrollLayout"; 
@@ -48,14 +52,14 @@ public class ScrollLayout extends ViewGroup {
 	}
 	
 	@Override
-	protected void onLayout(boolean changed, int l, int u, int r, int b) {
-		// TODO Auto-generated method stub
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		
 		if(changed) {
 			int childLeft = 0;
 			final int childCount = getChildCount();
 			
-			for(int i=0; i <childCount; i++) {
+			//遍历所有子视图
+			for(int i=0; i < childCount; i++) {
 				final View childView = getChildAt(i);
 				
 				if(childView.getVisibility() != View.GONE) {
@@ -70,7 +74,6 @@ public class ScrollLayout extends ViewGroup {
 	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		// TODO Auto-generated method stub
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 			
 		final int width = MeasureSpec.getSize(widthMeasureSpec);
@@ -93,7 +96,6 @@ public class ScrollLayout extends ViewGroup {
 	}
 	
 	public void snapToScreen(int whichScreen) {
-		//get the valid layout page
 		whichScreen = Math.max(0, Math.min(whichScreen, getChildCount() - 1));
 		if(getScrollX() != (whichScreen*getWidth())) {
 			final int delta = whichScreen*getWidth() - getScrollX();
@@ -121,31 +123,39 @@ public class ScrollLayout extends ViewGroup {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		// TODO Auto-generated method stub
+		//获取操作类型
 		final int action = event.getAction();
-		final float x = event.getX();
-		final float y = event.getY();
+		
+		final float x = event.getX();//获取相对当前控件左上角的x坐标
+		final float y = event.getY();//获取相对当前控件左上角的y坐标
 		
 		switch(action) {
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_DOWN: //用户开始触摸
 			
 			Log.i("ACTION_DOWN", "onTouchEvent ACTION_DOWN");
 			
+			
 			if(mVelocityTracker == null) {
+				//获取VelocityTracker的实例对象mVelocityTracker
 				mVelocityTracker = VelocityTracker.obtain();
+				//将当前移动事件传给mVelocityTracker对象
 				mVelocityTracker.addMovement(event);
 			}
 			
-			if(!mScroller.isFinished()) {
+			
+			if(!mScroller.isFinished()) { //判断scroll行为是否结束
+				//若未结束，则强制结束
 				mScroller.abortAnimation();
 			}
 			
+			//记录手指按下时的横坐标
 			mLastMotionX = x;
+			
 			break;
 			
-		case MotionEvent.ACTION_MOVE:  
+		case MotionEvent.ACTION_MOVE:  //用户手指在移动
 	       
-			int deltaX = (int)(mLastMotionX - x);
+			int deltaX = (int)(mLastMotionX - x);//计算位移
 	           
      	   	if (IsCanMove(deltaX))
      	   	{
@@ -166,6 +176,7 @@ public class ScrollLayout extends ViewGroup {
 			int velocityX = 0;
 			if(mVelocityTracker != null) {
 				mVelocityTracker.addMovement(event);
+				//初始化速率的单位，1000意为1秒内运动了多少个像素
 				mVelocityTracker.computeCurrentVelocity(1000);
 				velocityX = (int)mVelocityTracker.getXVelocity();
 			}
@@ -194,6 +205,11 @@ public class ScrollLayout extends ViewGroup {
 		return super.onTouchEvent(event);
 	}
 	
+	/**
+	 * 判断
+	 * @param deltaX
+	 * @return
+	 */
 	private boolean IsCanMove(int deltaX) {
 		if(getScrollX() <= 0 && deltaX < 0)
 		{
