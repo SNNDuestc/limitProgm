@@ -1,5 +1,6 @@
 package com.uestc.snnd.activity;
 
+import com.uestc.snnd.R;
 
 import android.app.Activity;
 import android.content.Intent;

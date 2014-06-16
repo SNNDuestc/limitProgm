@@ -15,4 +15,6 @@
     <string name="tv_user">用户名</string>
     <string name="but_start">开始使用</string>
     <string name="default_user">默认用户</string>
+    <string name="slogan">here typing in our slogan</string>
+    <string name="startBtn">start</string>
 </resources>

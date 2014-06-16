@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neurosky.thinkgear.*;
+import com.uestc.snnd.R;
 
 public class MainActivity extends Activity {
 	
