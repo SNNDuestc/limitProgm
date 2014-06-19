@@ -5,7 +5,6 @@
     android:layout_height="fill_parent"
     >
            
-
     <Button
         android:id="@+id/main_but_exit"
         android:layout_width="100dp"
@@ -13,24 +12,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="@+string/but_exit" />
-
-    <Button
-        android:id="@+id/main_but_connect"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="doStuff"
-        android:text="@+string/but_connect" />
-
-    <Button
-        android:id="@+id/main_but_set"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_weight="1.00"
-        android:text="@+string/but_set" />
     
     <TextView
         android:id="@+id/main_tv_state"
@@ -46,23 +27,39 @@
 
     <TextView
         android:id="@+id/main_tv_userId"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/main_tv_state"
         android:hint="@+string/default_user" />
 
-    <TextView
-        android:id="@+id/main_tv_data"
-        android:layout_width="wrap_content"
-        android:layout_height="200dp"
+    <Spinner
+        android:id="@+id/main_spinner_graphic"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/main_but_exit"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:id="@+id/main_but_set"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/main_spinner_graphic"
+        android:layout_weight="1.00"
+        android:text="@+string/but_set" />
+
+    <LinearLayout
+        android:id="@+id/main_linear_chart"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:hint="Raw EEG Data"
-        android:scrollbars="vertical"
-        android:singleLine="false" 
-        />
+        android:layout_below="@+id/main_tv_userId"
+        android:layout_above="@+id/main_spinner_graphic"
+        android:orientation="vertical" >
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, HelloEEGActivity!</string>
-    <string name="app_name">HelloEEG</string>
-    <string name="but_connect">连接</string>
+    <string name="app_name">Epilepsy_service</string>
+    <string name="but_select">选择</string>
     <string name="but_set">设置</string>
     <string name="but_exit">退出</string>
     <string name="tv_state">设备状态</string>
