@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
+        android:background="@drawable/main_list_item_press"
         android:hint="@+string/tv_state" 
         android:singleLine="true" 
         android:ellipsize="marquee">     
@@ -32,6 +33,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/main_tv_state"
+        android:background="@drawable/main_list_item_press"
         android:hint="@+string/default_user" />
 
     <Spinner
@@ -52,14 +54,22 @@
 
     <LinearLayout
         android:id="@+id/main_linear_chart"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/main_spinner_graphic"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/main_tv_userId"
-        android:layout_above="@+id/main_spinner_graphic"
         android:orientation="vertical" >
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/main_but_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="发短信" />
 
 </RelativeLayout>

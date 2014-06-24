@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/helpSetting_et_name"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:ems="10" />
+
+        <EditText
+            android:id="@+id/helpSetting_et_tel"
+            android:layout_width="257dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.13"
+            android:ems="10" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/helpSetting_et_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.11" >
+
+        <Button
+            android:id="@+id/helpSetting_but_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@+string/but_confirm" />
+
+        <Button
+            android:id="@+id/helpSetting_but_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="@+string/but_cancel" />
+
+    </RelativeLayout>
+
+</LinearLayout>

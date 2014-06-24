@@ -9,7 +9,7 @@ import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
-import com.uestc.snnd.RawEegData;
+import com.uestc.snnd.DataSet;
 
 import android.app.Activity;
 import android.content.Context;

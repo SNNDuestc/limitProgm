@@ -2,7 +2,7 @@ package com.uestc.snnd;
 
 import android.app.Application;
 
-public class RawEegData extends Application {
+public class DataSet extends Application {
 	
 	/*设置该全局变量：
 	 * 由于设备大约每0.002秒传回一个脑电数据，这个速度太快，不便于处理。
@@ -23,6 +23,9 @@ public class RawEegData extends Application {
 								   		0,0,0,0,0,0,0,0,0,0};
 	private int first, last;										//定义队首，队尾
 	private int length;												//定义数组长度
+	String name;
+	String Tel;
+	String Message;
 	
 	//获得20个数据数组
 	public float[] get_Raw_EegData_list(){
@@ -71,6 +74,45 @@ public class RawEegData extends Application {
 			first--;
 	}
 	
+	public Boolean setName(String name){
+		if(name != null){
+		this.name = name;
+		return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public Boolean setTel(String tel){
+		if(tel != null){
+		this.Tel = tel;
+		return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public Boolean setMessage(String Mes){
+		if(Mes != null){
+		this.Message = Mes;
+		return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public String getTel(){
+		return this.Tel;
+	}
+	
+	public String getMessage(){
+		return this.Message;
+	}
+	
 	 public void onCreate() {
 	        // TODO Auto-generated method stub
 	        super.onCreate();
@@ -79,6 +121,7 @@ public class RawEegData extends Application {
 	        Raw_EegData_list = new float[length];
 	        first = 99;
 	        last = 99;
+	        Message = "我现在处于危险状态";
 	    	 
 	    	 for(int i=0; i<length; i++){
 	    		 Raw_EegData_list[i] = 0;

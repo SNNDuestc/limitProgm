@@ -19,12 +19,14 @@ import org.achartengine.tools.ZoomListener;
 
 import android.R.color;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.telephony.SmsManager;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,25 +42,27 @@ import android.widget.Toast;
 
 import com.neurosky.thinkgear.*;
 import com.uestc.snnd.R;
-import com.uestc.snnd.RawEegData;
+import com.uestc.snnd.DataSet;
+import com.uestc.snnd.graphic.AbnormalEegPieChart;
 
 public class MainActivity extends Activity {
 	
-	private static final String DATA_LOG="Data log";
 	private static final int EEG_DATA_MAX = 32767;
 	
 	BluetoothAdapter bluetoothAdapter;	
-	private ListView graphic_list;
 	private TextView state;
 	private TextView user_id;
 	private Spinner graphic_spinner;
 	private Button set;
 	private Button exit;
-	private RawEegData rawEegData;
+	private Button send;
+	private DataSet dataSet;
+	private boolean isRunning = false;
+	private int count = -1;
 //	private EegGraphics eegGraphics = null;																	//声明绘图的view
 	
 	private int x_up_left, y_up_left, x_up_right, y_up_right;												//绘图区域，上方控件左下角, 右下角的坐标
-	private int x_down_left, y_down_left, x_down_right, y_down_right;										//绘图区域，下方空间左上角， 右上角的坐标
+	private int x_down_left, y_down_left;										//绘图区域，下方空间左上角， 右上角的坐标
 	private float [] paint_data;																				//画图使用的坐标，是由原数据处理得到
 	private int window_width;
 	TGDevice tgDevice;
@@ -75,10 +79,7 @@ public class MainActivity extends Activity {
 	private XYSeriesRenderer mCurrentRenderer;   
 	private String mDateFormat;  
 	private GraphicalView mChartView;   
-	private int index = 0;  
-	
-	
-	 @Override  
+	@Override  
 	  protected void onRestoreInstanceState(Bundle savedState) {  
 	    super.onRestoreInstanceState(savedState);  
 	    mDataset = (XYMultipleSeriesDataset) savedState.getSerializable("dataset");  
@@ -98,6 +99,46 @@ public class MainActivity extends Activity {
 	    outState.putString("date_format", mDateFormat);  
 	  }  
 	  
+	    private Thread GetDataThread = new Thread (new Runnable(){
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while(isRunning){
+					try{
+//						rawEegData.add_Raw_EegData_list(msg.arg1);
+						if(tgDevice == null)
+							throw new InterruptedException();
+		            	
+		            	mDataset.removeSeries(mCurrentSeries);
+		                
+		                int length = mCurrentSeries.getItemCount();
+		                if(length > dataSet.get_length()){
+		                	length = dataSet.get_length(); 
+		                }
+		                
+		                mCurrentSeries.clear();
+		                for(int i = 0; i < dataSet.get_length();i++)
+		                mCurrentSeries.add(i, dataSet.get_Raw_EegData(i));
+		                
+		                mDataset.addSeries(mCurrentSeries);
+		                
+		                if(counter >= dataSet.get_length())
+		                	counter = 0;
+		                
+		            	counter++; 
+		            	
+		            	if(counter % 10 == 0)
+		            	mChartView.invalidate();
+					}catch(InterruptedException e){
+						e.printStackTrace();
+					}
+				}
+				
+			}
+	    	
+	    });
+	  
 	  
 	
     /** Called when the activity is first created. */
@@ -108,12 +149,13 @@ public class MainActivity extends Activity {
         
         setContentView(R.layout.main_activity);
         
-        rawEegData = (RawEegData)getApplication();      
+        dataSet = (DataSet)getApplication();      
         user_id    = (TextView)findViewById(R.id.main_tv_userId);
         state 	   = (TextView)findViewById(R.id.main_tv_state);
         graphic_spinner   = (Spinner)findViewById(R.id.main_spinner_graphic);
         set        = (Button)findViewById(R.id.main_but_set);
         exit       = (Button)findViewById(R.id.main_but_exit);
+        send	   = (Button)findViewById(R.id.main_but_send);
         //graphic_list = (ListView)findViewById(R.id.main_lv_graphicList);
         
         window_width = this.getWindow().getWindowManager().getDefaultDisplay().getWidth();
@@ -146,12 +188,12 @@ public class MainActivity extends Activity {
         mRenderer.setYTitle("脑电");//设置y轴的标题 
         mRenderer.setYAxisMax(EEG_DATA_MAX);
         mRenderer.setYAxisMin(-EEG_DATA_MAX);
-        mRenderer.setXAxisMax(rawEegData.get_length());
+        mRenderer.setXAxisMax(dataSet.get_length());
         mRenderer.setXAxisMin(0);
         mRenderer.setShowGrid(true);
         mRenderer.setGridColor(Color.GREEN);
     	
-    	paint_data = new float[rawEegData.get_length()*2]; 
+    	paint_data = new float[dataSet.get_length()*2]; 
     	
     	String seriesTitle = "脑电数据";//图例    
         XYSeries series = new XYSeries(seriesTitle);//定义XYSeries  
@@ -170,12 +212,12 @@ public class MainActivity extends Activity {
         state.setText("Android version: " + Integer.valueOf(android.os.Build.VERSION.SDK) + "\n" );
         
         //初始化graphic_spinner
-        String []  mGraphics = {"脑电图", "放松度", "专注度"};
+        String []  mGraphics = {"脑电图", "脑波异常次数统计", "专注度"};
         ArrayList<String> allGraphics = new ArrayList<String>();
         for(int i=0;i<mGraphics.length;i++)
         {
         	allGraphics.add(mGraphics[i]);
-        	mCurrentSeries.add(i, rawEegData.get_Raw_EegData(i));
+        	mCurrentSeries.add(i, dataSet.get_Raw_EegData(i));
         }
         
         ArrayAdapter<String> aspnGraphics = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allGraphics);
@@ -189,6 +231,25 @@ public class MainActivity extends Activity {
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
+				String str = parent.getItemAtPosition(position).toString();
+				switch(str){
+				case "脑电图":
+					{
+						Toast.makeText(MainActivity.this, "当前页面", Toast.LENGTH_SHORT).show();
+						break;
+					}
+				case "脑波异常统计":
+					{
+						
+						Intent intent_PieChart = new AbnormalEegPieChart().execute(MainActivity.this);
+						startActivity(intent_PieChart);
+						break;
+					}
+				case "专注度":
+					{
+					
+					}
+				}
 				
 			}
 
@@ -210,6 +271,30 @@ public class MainActivity extends Activity {
 				
 			}
 			
+		});
+        
+        //测试发送短信功能
+        send.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(dataSet.getTel() == null)
+					Toast.makeText(MainActivity.this, "请设置发送短息功能", Toast.LENGTH_SHORT)  
+                    .show(); 
+				else{
+					SmsManager sms = SmsManager.getDefault();
+					if(sms != null){
+					String mes = dataSet.getMessage().toString();
+					String desnm = dataSet.getTel().toString();
+					PendingIntent mPI = PendingIntent.getBroadcast(MainActivity.this, 0, new Intent(), 0);
+					sms.sendTextMessage(desnm, null, mes, mPI, null);
+					}else{
+						Toast.makeText(MainActivity.this, "短信功能不可用", Toast.LENGTH_SHORT)  
+	                    .show(); 
+					}
+				}
+			}
 		});
 
         
@@ -243,8 +328,8 @@ public class MainActivity extends Activity {
     private List<String> getData(){
         
         List<String> data = new ArrayList<String>();
-        data.add("脑电折线图");
-        data.add("专注度");
+        data.add("脑电图");
+        data.add("脑波异常统计");
         data.add("放松度");
          
         return data;
@@ -264,45 +349,45 @@ public class MainActivity extends Activity {
           mChartView = ChartFactory.getLineChartView(this, mDataset, mRenderer);  
           mRenderer.setClickEnabled(true);//设置图表是否允许点击  
           mRenderer.setSelectableBuffer(100);//设置点的缓冲半径值(在某点附件点击时,多大范围内都算点击这个点)  
-          mChartView.setOnClickListener(new View.OnClickListener() {  
-            @Override  
-            public void onClick(View v) {  
-                //这段代码处理点击一个点后,获得所点击的点在哪个序列中以及点的坐标.  
-                //-->start  
-              SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();  
-              double[] xy = mChartView.toRealPoint(0);  
-              if (seriesSelection == null) {  
-                Toast.makeText(MainActivity.this, "No chart element was clicked", Toast.LENGTH_SHORT)  
-                    .show();  
-              } else {  
-                Toast.makeText(  
-                		MainActivity.this,  
-                    "Chart element in series index " + seriesSelection.getSeriesIndex()  
-                        + " data point index " + seriesSelection.getPointIndex() + " was clicked"  
-                        + " closest point value X=" + seriesSelection.getXValue() + ", Y=" + seriesSelection.getValue()  
-                        + " clicked point value X=" + (float) xy[0] + ", Y=" + (float) xy[1], Toast.LENGTH_SHORT).show();  
-              }  
-              //-->end  
-            }  
-          });  
-          mChartView.setOnLongClickListener(new View.OnLongClickListener() {  
-            @Override  
-            public boolean onLongClick(View v) {  
-              SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();  
-              if (seriesSelection == null) {  
-                Toast.makeText(MainActivity.this, "No chart element was long pressed",  
-                    Toast.LENGTH_SHORT);  
-                return false; // no chart element was long pressed, so let something  
-                // else handle the event  
-              } else {  
-                Toast.makeText(MainActivity.this, "Chart element in series index "  
-                    + seriesSelection.getSeriesIndex() + " data point index "  
-                    + seriesSelection.getPointIndex() + " was long pressed", Toast.LENGTH_SHORT);  
-                return true; // the element was long pressed - the event has been  
-                // handled  
-              }  
-            }  
-          });  
+//          mChartView.setOnClickListener(new View.OnClickListener() {  
+//            @Override  
+//            public void onClick(View v) {  
+//                //这段代码处理点击一个点后,获得所点击的点在哪个序列中以及点的坐标.  
+//                //-->start  
+//              SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();  
+//              double[] xy = mChartView.toRealPoint(0);  
+//              if (seriesSelection == null) {  
+//                Toast.makeText(MainActivity.this, "No chart element was clicked", Toast.LENGTH_SHORT)  
+//                    .show();  
+//              } else {  
+//                Toast.makeText(  
+//                		MainActivity.this,  
+//                    "Chart element in series index " + seriesSelection.getSeriesIndex()  
+//                        + " data point index " + seriesSelection.getPointIndex() + " was clicked"  
+//                        + " closest point value X=" + seriesSelection.getXValue() + ", Y=" + seriesSelection.getValue()  
+//                        + " clicked point value X=" + (float) xy[0] + ", Y=" + (float) xy[1], Toast.LENGTH_SHORT).show();  
+//              }  
+//              //-->end  
+//            }  
+//          });  
+//          mChartView.setOnLongClickListener(new View.OnLongClickListener() {  
+//            @Override  
+//            public boolean onLongClick(View v) {  
+//              SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();  
+//              if (seriesSelection == null) {  
+//                Toast.makeText(MainActivity.this, "No chart element was long pressed",  
+//                    Toast.LENGTH_SHORT);  
+//                return false; // no chart element was long pressed, so let something  
+//                // else handle the event  
+//              } else {  
+//                Toast.makeText(MainActivity.this, "Chart element in series index "  
+//                    + seriesSelection.getSeriesIndex() + " data point index "  
+//                    + seriesSelection.getPointIndex() + " was long pressed", Toast.LENGTH_SHORT);  
+//                return true; // the element was long pressed - the event has been  
+//                // handled  
+//              }  
+//            }  
+//          });  
           //这段代码处理放大缩小  
           //-->start  
           mChartView.addZoomListener(new ZoomListener() {  
@@ -368,32 +453,33 @@ public class MainActivity extends Activity {
             	//state.setText("PoorSignal: " + msg.arg1 + "\n");
                 break;
             case TGDevice.MSG_RAW_DATA:	//Raw EEG data  
-            {	
-            	rawEegData.add_Raw_EegData_list(msg.arg1);
+            {	count++;
+            	if(count % 64 == 0){
+            		if(count >= 2048)
+            			count = 0;
+            		dataSet.add_Raw_EegData_list(msg.arg1);
             	
-            	double x = counter;  
-                double y = msg.arg1;
-                
-                mDataset.removeSeries(mCurrentSeries);
+            	mDataset.removeSeries(mCurrentSeries);
                 
                 int length = mCurrentSeries.getItemCount();
-                if(length > rawEegData.get_length()){
-                	length = rawEegData.get_length(); 
+                if(length > dataSet.get_length()){
+                	length = dataSet.get_length(); 
                 }
                 
                 mCurrentSeries.clear();
-                for(int i = 0; i < rawEegData.get_length();i++)
-                mCurrentSeries.add(i, rawEegData.get_Raw_EegData(i));
+                for(int i = 0; i < dataSet.get_length();i++)
+                mCurrentSeries.add(i, dataSet.get_Raw_EegData(i));
                 
                 mDataset.addSeries(mCurrentSeries);
                 
-                if(counter >= rawEegData.get_length())
-                	counter = 0;
-                
-            	counter++; 
-            	
-            	if(counter % 10 == 0)
+//                if(counter >= rawEegData.get_length())
+//                	counter = 0;
+//                
+//            	counter++; 
+//            	
+//            	if(counter % 10 == 0)
             	mChartView.invalidate();
+            	}
             }
             	break;
             case TGDevice.MSG_HEART_RATE://Heart rate data
